@@ -1164,6 +1164,7 @@ Acceptance Criteria
 - Multiple images may be uploaded.
 - Images may be removed.
 - Images may be reordered.
+- Optional alt text may be provided for each image to support accessibility.
 - One image shall be designated as the Primary Image.
 
 ---
@@ -1649,6 +1650,7 @@ Acceptance Criteria
 
 - Multiple artworks may be assigned.
 - Assignment may be performed from the collection or artwork page.
+- The artist may manually control the display order of artworks within a collection.
 - Duplicate assignments are prevented.
 
 ---
@@ -2422,9 +2424,10 @@ The artist shall be able to update the payment status.
 Supported payment statuses:
 
 - Pending
-- Awaiting Payment
 - Paid
 - Refunded
+
+The "Awaiting Payment" stage is represented by the Order status rather than the Payment status to avoid tracking the same business state twice.
 
 Acceptance Criteria
 
