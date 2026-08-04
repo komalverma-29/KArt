@@ -775,8 +775,8 @@ Collections help visitors explore groups of related artwork rather than individu
 
 Version 1 rules:
 
-- One artwork belongs to at most one collection.
-- A collection may contain many artworks.
+- An artwork may belong to zero, one, or multiple collections.
+- A collection may contain zero or more artworks.
 - Collections are optional.
 
 ---
