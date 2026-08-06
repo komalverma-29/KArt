@@ -1,6 +1,4 @@
 // prisma/schema.prisma
-// Datasource and generator only in this phase (Epic 0 — Foundation).
-// Domain models are added in Epic 1 per design.md §5.
 
 generator client {
   provider = "prisma-client-js"
@@ -9,4 +7,79 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────────────────────
+// Enums
+// ─────────────────────────────────────────────
+
+enum ContentStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum CategoryStatus {
+  ACTIVE
+  ARCHIVED
+}
+
+enum Availability {
+  AVAILABLE
+  RESERVED
+  SOLD
+  NOT_FOR_SALE
+  COMMISSION_AVAILABLE
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  AWAITING_PAYMENT
+  PAID
+  PREPARING_SHIPMENT
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  REFUNDED
+}
+
+enum PaymentMethod {
+  BANK_TRANSFER
+  UPI
+  CASH
+  OTHER
+}
+
+enum CommissionStatus {
+  NEW
+  UNDER_REVIEW
+  ACCEPTED
+  DECLINED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum ContactStatus {
+  NEW
+  READ
+  REPLIED
+  CLOSED
+}
+
+enum ActivityType {
+  ARTWORK_CREATED
+  ARTWORK_PUBLISHED
+  ARTWORK_ARCHIVED
+  STORY_PUBLISHED
+  COLLECTION_CREATED
+  CATEGORY_CREATED
+  ORDER_RECEIVED
+  COMMISSION_REQUEST_RECEIVED
 }
