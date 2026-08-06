@@ -1,0 +1,12 @@
+// prisma/schema.prisma
+// Datasource and generator only in this phase (Epic 0 — Foundation).
+// Domain models are added in Epic 1 per design.md §5.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
