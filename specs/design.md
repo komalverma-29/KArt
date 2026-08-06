@@ -164,7 +164,7 @@ Order (1) ──▶ (n) OrderItem
 Order (1) ──▶ (1) Payment
 Order (1) ──▶ (n) OrderStatusHistory
 
-Commission (1) ──▶ (n) CommissionReferenceImage
+Commission (1) ──▶ (n) CommissionImage
 Commission (1) ──▶ (n) CommissionStatusHistory
 ```
 
@@ -690,6 +690,7 @@ Per `structure.md`, each business domain owns a `services/<domain>` and `reposit
 | Contact | `ContactService` | `ContactRepository` | Message intake, status workflow |
 | Settings | `SettingsService` | `SettingsRepository` | Artist profile / site configuration |
 | Dashboard | `DashboardService` | (reuses multiple repositories) | Aggregated statistics, recent activity |
+| Insights | `InsightsService` | (reuses Artwork/Order/Commission repositories) | Content summary, popular artwork, recent orders/commissions summary (product.md Insights, SRS §4.13) |
 | Auth | `AuthService` (wraps Auth.js) | `ArtistRepository` | Login validation, password change, session |
 | Activity | `ActivityLogService` | `ActivityLogRepository` | Records events consumed by Dashboard |
 
@@ -916,6 +917,7 @@ app/
 ├── (studio)/
 │   ├── layout.tsx                      # Studio shell (Sidebar nav, auth guard)
 │   ├── dashboard/page.tsx              # FR-DASH
+│   ├── insights/page.tsx               # FR-INSIGHT
 │   ├── artworks/page.tsx               # List/search/filter
 │   ├── artworks/new/page.tsx           # Create
 │   ├── artworks/[id]/page.tsx          # Edit/view
@@ -999,13 +1001,15 @@ Applying `structure.md` to KArt's actual modules:
 
 ```
 kart/
-├── docs/
+├── steering_files/
 │   ├── product.md
 │   ├── tech.md
 │   ├── structure.md
-│   ├── development_rules.md
+│   └── development_rules.md
+├── specs/
 │   ├── requirements.md
-│   └── design.md
+│   ├── design.md
+│   └── tasks.md
 ├── prisma/
 │   ├── schema.prisma
 │   └── migrations/
@@ -1457,6 +1461,7 @@ This design covers all SRS modules end-to-end:
 | 4.10 Commission Management | §5 Commission/CommissionImage/CommissionStatusHistory, §6 CommissionService, §14.4 |
 | 4.11 Contact Management | §5 ContactMessage, §6 ContactService |
 | 4.12 Settings | §5 Artist, §6 SettingsService |
+| 4.13 Insights | §6 InsightsService, §8.1 route, reuses Artwork/Order/Commission repositories |
 | 5. Public Website | §8 UI Architecture, route map |
 | 6. Common Functional Behaviors | §11 State Management (pagination/filter/sort via URL state), §12 Validation, soft-delete pattern in §5.1 |
 | 7. Non-Functional Requirements | §15 |

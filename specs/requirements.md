@@ -3067,6 +3067,114 @@ Acceptance Criteria
 
 - BR-003 Studio Access
 
+---
+
+# 4.13 Insights
+
+## Module Overview
+
+Insights provides the artist with a lightweight, read-only view of platform performance, separate from the operational overview on the Dashboard (§4.2).
+
+Where the Dashboard focuses on day-to-day workload (drafts, pending orders, pending commissions, quick actions), Insights focuses on a simple retrospective view of what has been happening on the platform.
+
+Version 1 intentionally limits Insights to counts and short lists. Complex analytics, charts, and date-range reporting are out of scope for Version 1 (per `product.md` Principle 6 — Simplicity Without Limitation).
+
+---
+
+## Functional Requirements
+
+### FR-INSIGHT-001 Content Summary
+
+The system shall display a summary of content counts.
+
+Version 1 shall include:
+
+- Total Artworks
+- Published Artworks
+- Draft Artworks
+- Total Collections
+- Total Stories
+
+Acceptance Criteria
+
+- Counts reflect the latest available data.
+- Empty values display as zero.
+
+---
+
+### FR-INSIGHT-002 Popular Artwork
+
+The system shall display a short list of the most-viewed published artworks.
+
+Acceptance Criteria
+
+- The list is limited to a small, fixed number of items (Version 1: top 5).
+- Only Published artwork is eligible.
+- If view counts are unavailable, the list falls back to the most recently published artwork and is labeled accordingly.
+
+---
+
+### FR-INSIGHT-003 Recent Orders Summary
+
+The system shall display a short list of the most recent orders.
+
+Acceptance Criteria
+
+- The list is limited to a small, fixed number of items (Version 1: 5).
+- Each entry shows order status and date.
+- Selecting an entry navigates to the Order detail page (§4.8).
+
+---
+
+### FR-INSIGHT-004 Recent Commissions Summary
+
+The system shall display a short list of the most recent commission requests.
+
+Acceptance Criteria
+
+- The list is limited to a small, fixed number of items (Version 1: 5).
+- Each entry shows commission status and date.
+- Selecting an entry navigates to the Commission detail page (§4.10).
+
+---
+
+### FR-INSIGHT-005 Empty State
+
+If no data exists for a given Insights section, the system shall display a simple empty state instead of an empty chart or table.
+
+Acceptance Criteria
+
+- Empty sections state clearly that no data is available yet.
+- No section fails to render or errors due to missing data.
+
+---
+
+## Validation Rules
+
+Insights information is read-only.
+
+The Insights page shall never allow direct modification of content; every entry links out to its owning module (Artwork, Order, or Commission).
+
+---
+
+## Error Handling
+
+| Scenario | Expected Behavior |
+|----------|-------------------|
+| Statistics unavailable | Display placeholder values |
+| Popular artwork data unavailable | Fall back per FR-INSIGHT-002 |
+| Network failure | Display retry option |
+| Unauthorized access | Redirect to Login |
+
+---
+
+## Business Rules Referenced
+
+- BR-001 Artist Ownership
+- BR-003 Studio Access
+
+---
+
 # 5. Public Website
 
 ## Module Overview

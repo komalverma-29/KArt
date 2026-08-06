@@ -115,7 +115,8 @@ The project uses the following top-level structure.
 ```text
 kart/
 
-├── docs/
+├── specs/
+├── steering_files/
 ├── prisma/
 ├── public/
 ├── src/
@@ -130,18 +131,34 @@ kart/
 
 # Root Directory Responsibilities
 
-## docs/
+## steering_files/
 
-Project documentation.
+Steering documents, per the Authority Hierarchy in `development_rules.md`.
 
-Examples:
+Contains:
 
-- Product documentation
-- Technical steering
-- Architecture Decision Records (ADR)
-- Requirements
-- Design
-- Tasks
+- `product.md`
+- `tech.md`
+- `structure.md`
+- `development_rules.md`
+
+These define what KArt is, how it is built, where things belong, and how contributors work. They take priority over the contents of `specs/`.
+
+Application code should never be placed here.
+
+---
+
+## specs/
+
+Specification documents, per the Authority Hierarchy in `development_rules.md`.
+
+Contains:
+
+- `requirements.md`
+- `design.md`
+- `tasks.md`
+
+These implement the steering documents and must never contradict them. Architecture Decision Records (ADRs), if introduced later, also belong here.
 
 Application code should never be placed here.
 
@@ -244,7 +261,7 @@ Examples:
 - Collections
 - Shop
 - Artwork Details
-- Journal
+- Stories
 - About
 - Commissions
 - Contact
@@ -264,7 +281,7 @@ Examples:
 - Collections
 - Orders
 - Shop
-- Journal
+- Stories
 - Insights
 - Settings
 
@@ -1333,23 +1350,25 @@ Every required variable should be documented inside `.env.example`.
 Documentation belongs inside:
 
 ```
-docs/
+steering_files/
+specs/
 ```
 
-Recommended structure
+Structure
 
 ```
-docs/
+steering_files/
 
-adr/
+  product.md
+  tech.md
+  structure.md
+  development_rules.md
 
-guides/
+specs/
 
-requirements/
-
-design/
-
-architecture/
+  requirements.md
+  design.md
+  tasks.md
 ```
 
 Avoid mixing documentation with application code.
