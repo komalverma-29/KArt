@@ -11,13 +11,9 @@ const CONTENT_TYPE_BY_EXT: Record<string, string> = {
   ".webp": "image/webp",
 };
 
-/**
- * Serves locally stored uploads in development. In production this
- * route should be replaced by pointing StorageService at Cloudinary/S3
- * directly (design.md §3.2) — no other file needs to change.
- */
-export async function GET(_req: NextRequest, { params }: { params: { filename: string } }) {
-  const safeName = path.basename(params.filename);
+export async function GET(_req: NextRequest, { params }: { params: Promise<{ filename: string }> }) {
+  const { filename } = await params;
+  const safeName = path.basename(filename);
   const ext = path.extname(safeName).toLowerCase();
   const contentType = CONTENT_TYPE_BY_EXT[ext];
 
