@@ -1,15 +1,28 @@
 import { prisma } from "@/lib/prisma";
-import type { OrderStatus, Prisma } from "@prisma/client";
+import type { OrderStatus, PaymentStatus, Prisma } from "@prisma/client";
+
+export type OrderSort = "newest" | "oldest" | "customerName" | "totalAmount";
 
 export interface OrderListFilters {
   status?: OrderStatus;
+  paymentStatus?: PaymentStatus; // FR-ORDER-010
+  dateFrom?: Date; // FR-ORDER-010 — order date filter
+  dateTo?: Date;
   search?: string; // matches orderNumber, customerName, or customerEmail
+  sort?: OrderSort; // FR-ORDER-011
 }
 
 const orderInclude = {
   items: true,
   payment: true,
   statusHistory: { orderBy: { changedAt: "asc" as const } },
+};
+
+const ORDER_BY: Record<OrderSort, Prisma.OrderOrderByWithRelationInput> = {
+  newest: { createdAt: "desc" },
+  oldest: { createdAt: "asc" },
+  customerName: { customerName: "asc" },
+  totalAmount: { totalAmount: "desc" },
 };
 
 export const OrderRepository = {
@@ -25,6 +38,15 @@ export const OrderRepository = {
     const where: Prisma.OrderWhereInput = {
       deletedAt: null,
       ...(filters.status ? { status: filters.status } : {}),
+      ...(filters.paymentStatus ? { payment: { is: { status: filters.paymentStatus } } } : {}),
+      ...(filters.dateFrom || filters.dateTo
+        ? {
+            createdAt: {
+              ...(filters.dateFrom ? { gte: filters.dateFrom } : {}),
+              ...(filters.dateTo ? { lte: filters.dateTo } : {}),
+            },
+          }
+        : {}),
       ...(filters.search
         ? {
             OR: [
@@ -35,7 +57,11 @@ export const OrderRepository = {
           }
         : {}),
     };
-    return prisma.order.findMany({ where, include: orderInclude, orderBy: { createdAt: "desc" } });
+    return prisma.order.findMany({
+      where,
+      include: orderInclude,
+      orderBy: ORDER_BY[filters.sort ?? "newest"],
+    });
   },
 
   /**

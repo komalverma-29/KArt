@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { Suspense, useState, type FormEvent } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { ResetPasswordSchema } from "@/schemas/auth/ResetPasswordSchema";
 import { resetPasswordAction } from "@/features/auth/actions/resetPasswordAction";
 
-export default function ResetPasswordPage() {
+function ResetPasswordContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const token = searchParams.get("token") ?? "";
@@ -125,5 +125,13 @@ export default function ResetPasswordPage() {
         </button>
       </form>
     </main>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={null}>
+      <ResetPasswordContent />
+    </Suspense>
   );
 }

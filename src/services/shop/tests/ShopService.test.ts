@@ -120,6 +120,45 @@ describe("ShopService.listAvailableForSale", () => {
       status: "PUBLISHED",
     });
   });
+
+  it("passes category, collection, and search filters through to ArtworkRepository.list (FR-SHOP-002/003)", async () => {
+    vi.mocked(ArtworkRepository.list).mockResolvedValue([]);
+
+    await ShopService.listAvailableForSale({
+      categoryId: "cat1",
+      collectionId: "col1",
+      search: "sunset",
+    });
+
+    expect(ArtworkRepository.list).toHaveBeenCalledWith({
+      status: "PUBLISHED",
+      categoryId: "cat1",
+      collectionId: "col1",
+      search: "sunset",
+    });
+  });
+
+  it("applies a price range filter in-memory (FR-SHOP-002)", async () => {
+    vi.mocked(ArtworkRepository.list).mockResolvedValue([
+      { id: "a1", status: "PUBLISHED", forSale: true, price: 100 },
+      { id: "a2", status: "PUBLISHED", forSale: true, price: 500 },
+      { id: "a3", status: "PUBLISHED", forSale: true, price: 1000 },
+    ] as never);
+
+    const result = await ShopService.listAvailableForSale({ minPrice: 200, maxPrice: 800 });
+
+    expect(result.map((a) => a.id)).toEqual(["a2"]);
+  });
+
+  it("excludes unpriced artwork when a price range filter is applied", async () => {
+    vi.mocked(ArtworkRepository.list).mockResolvedValue([
+      { id: "a1", status: "PUBLISHED", forSale: true, price: null },
+    ] as never);
+
+    const result = await ShopService.listAvailableForSale({ minPrice: 0 });
+
+    expect(result).toEqual([]);
+  });
 });
 
 describe("ShopService.createOrderFromRequest", () => {

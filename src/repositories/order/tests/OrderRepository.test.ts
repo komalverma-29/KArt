@@ -1,4 +1,3 @@
-
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
 // Mocks the raw Prisma client (not a repository) — this is the one place
@@ -9,6 +8,7 @@ vi.mock("@/lib/prisma", () => ({
     order: {
       create: vi.fn(),
       findUnique: vi.fn(),
+      findMany: vi.fn(),
     },
     $transaction: vi.fn(),
   },
@@ -100,5 +100,66 @@ describe("OrderRepository.createFromPurchase — atomicity", () => {
     await expect(
       OrderRepository.createFromPurchase(input)
     ).rejects.toThrow("simulated DB failure mid-transaction");
+  });
+});
+
+describe("OrderRepository.list — filters and sort (FR-ORDER-009/010/011)", () => {
+  beforeEach(() => vi.resetAllMocks());
+
+  it("filters by payment status via the related Payment record", async () => {
+    vi.mocked(prisma.order.findMany).mockResolvedValue([]);
+
+    await OrderRepository.list({ paymentStatus: "PAID" });
+
+    const call = vi.mocked(prisma.order.findMany).mock.calls[0][0] as {
+      where: { payment: { is: { status: string } } };
+    };
+    expect(call.where.payment).toEqual({ is: { status: "PAID" } });
+  });
+
+  it("filters by an order date range", async () => {
+    vi.mocked(prisma.order.findMany).mockResolvedValue([]);
+
+    const dateFrom = new Date("2026-01-01");
+    const dateTo = new Date("2026-01-31");
+    await OrderRepository.list({ dateFrom, dateTo });
+
+    const call = vi.mocked(prisma.order.findMany).mock.calls[0][0] as {
+      where: { createdAt: { gte: Date; lte: Date } };
+    };
+    expect(call.where.createdAt).toEqual({ gte: dateFrom, lte: dateTo });
+  });
+
+  it("defaults to sorting by newest", async () => {
+    vi.mocked(prisma.order.findMany).mockResolvedValue([]);
+
+    await OrderRepository.list({});
+
+    const call = vi.mocked(prisma.order.findMany).mock.calls[0][0] as {
+      orderBy: Record<string, string>;
+    };
+    expect(call.orderBy).toEqual({ createdAt: "desc" });
+  });
+
+  it("sorts by customer name when requested", async () => {
+    vi.mocked(prisma.order.findMany).mockResolvedValue([]);
+
+    await OrderRepository.list({ sort: "customerName" });
+
+    const call = vi.mocked(prisma.order.findMany).mock.calls[0][0] as {
+      orderBy: Record<string, string>;
+    };
+    expect(call.orderBy).toEqual({ customerName: "asc" });
+  });
+
+  it("sorts by total amount when requested", async () => {
+    vi.mocked(prisma.order.findMany).mockResolvedValue([]);
+
+    await OrderRepository.list({ sort: "totalAmount" });
+
+    const call = vi.mocked(prisma.order.findMany).mock.calls[0][0] as {
+      orderBy: Record<string, string>;
+    };
+    expect(call.orderBy).toEqual({ totalAmount: "desc" });
   });
 });

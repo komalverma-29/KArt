@@ -15,15 +15,40 @@ export interface PurchaseRequestInput {
   quantity?: number;
 }
 
+export interface ShopListFilters {
+  categoryId?: string;
+  collectionId?: string;
+  search?: string;
+  minPrice?: number;
+  maxPrice?: number;
+}
+
 export const ShopService = {
   /**
-   * FR-SHOP-001 — Published + For Sale artwork only. Reuses
-   * ArtworkRepository directly rather than introducing a second
-   * artwork data source for the Shop.
+   * FR-SHOP-001/002/003 — Published + For Sale artwork only, with
+   * optional category/collection/search filters (FR-SHOP-002/003).
+   * Reuses ArtworkRepository directly rather than introducing a second
+   * artwork data source for the Shop. Price range is applied in-memory
+   * since ArtworkRepository has no native price-range filter.
    */
-  async listAvailableForSale() {
-    const artworks = await ArtworkRepository.list({ status: "PUBLISHED" });
-    return artworks.filter((artwork: { forSale: boolean }) => artwork.forSale);
+  async listAvailableForSale(filters: ShopListFilters = {}) {
+    const artworks = await ArtworkRepository.list({
+      status: "PUBLISHED",
+      ...(filters.categoryId ? { categoryId: filters.categoryId } : {}),
+      ...(filters.collectionId ? { collectionId: filters.collectionId } : {}),
+      ...(filters.search ? { search: filters.search } : {}),
+    });
+
+    return artworks.filter((artwork: { forSale: boolean; price: unknown }) => {
+      if (!artwork.forSale) return false;
+      if (filters.minPrice !== undefined || filters.maxPrice !== undefined) {
+        const price = artwork.price === null || artwork.price === undefined ? null : Number(artwork.price);
+        if (price === null) return false;
+        if (filters.minPrice !== undefined && price < filters.minPrice) return false;
+        if (filters.maxPrice !== undefined && price > filters.maxPrice) return false;
+      }
+      return true;
+    });
   },
 
   /**
